@@ -2,8 +2,9 @@
     "name": "iot",
     "version": "1.0.0",
     "description": "",
-    "main": "androdirat.js",
+    "main": "rat.js",
     "scripts": {
+      "start": "node rat.js",
       "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
