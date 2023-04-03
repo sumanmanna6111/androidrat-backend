@@ -144,6 +144,10 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
     socket.to(room).emit("locationdb", data);
   });
 
+  socket.on("screendb", (room, data) => {
+    socket.to(room).emit("screendb", data);
+  });
+  
   socket.on("record", (data) => {
     savemic(data);
     //socket.to(room).emit("record", data);
