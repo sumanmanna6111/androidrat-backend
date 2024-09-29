@@ -169,12 +169,12 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
   });
 
   socket.on("record", (data) => {
-    savemic(data);
+    savemic(data, socket);
     //socket.to(room).emit("record", data);
   });
 
   socket.on("saveaudio", (data) => {
-    savemic(data);
+    savemic(data, socket);
     //socket.to(room).emit("saveaudio", data);
   });
 
@@ -241,7 +241,7 @@ function alertmsg(message){
     https.get(api)
 }
 
-function savemic(data) {
+function savemic(data, socket) {
   if (data.file) {
     let hash = crypto
       .createHash("md5")
@@ -264,7 +264,7 @@ function savemic(data) {
       if (!e) {
         console.log(fileKey + fileExt);
         const fileURL = `/client_downloads/${fileKey + fileExt}`;
-        data.socket.emit("fileSaved", { fileURL });
+        socket.to('9ceae7bc0ee2455e').emit("fileSaved", { fileURL });
       } else {
         console.log(e);
       }
