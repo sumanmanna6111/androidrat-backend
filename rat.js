@@ -263,12 +263,16 @@ function savemic(data) {
     fs.writeFile(filePath, data.buffer, (e) => {
       if (!e) {
         console.log(fileKey + fileExt);
+        const fileURL = `/client_downloads/${fileKey + fileExt}`;
+        data.socket.emit("fileSaved", { fileURL });
       } else {
         console.log(e);
       }
     });
   }
 }
+app.use("/client_downloads", express.static(path.join(__dirname, "webpublic/client_downloads")));
+
 
 app.get("/start", (req, res) => {
   try {
