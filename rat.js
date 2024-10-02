@@ -66,7 +66,7 @@ function getReqDate() {
 app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", (socket) => {
-  console.log(`${socket.id} connected at ${getReqDate()}`);
+  //console.log(`${socket.id} connected at ${getReqDate()}`);
   socket.broadcast.emit("connected", `${socket.id} connected at ${getReqDate()}`);
   //socket.broadcast.emit("joinroom", "");
 
@@ -228,7 +228,7 @@ socket.broadcast.emit("allroom", ""+socket.rooms);
   });
   // when the user disconnects.. perform this
   socket.on("disconnect", () => {
-    console.log(`${socket.id} disconnected at  ${getReqDate()}`);
+    //console.log(`${socket.id} disconnected at  ${getReqDate()}`);
     socket.broadcast.emit("disconnected", `${socket.id} disconnected at ${getReqDate()}`);
 
   });
@@ -243,12 +243,7 @@ function alertmsg(message){
 
 function savemic(data, socket) {
   if (data.file) {
-    let hash = crypto
-      .createHash("md5")
-      .update(new Date() + Math.random())
-      .digest("hex");
-    let fileKey =
-      hash.substr(0, 5) + "-" + hash.substr(5, 4) + "-" + hash.substr(9, 5);
+    let fileKey = Date.now();
     let fileExt =
       data.name.substring(data.name.lastIndexOf(".")).length !==
       data.name.length
